@@ -1,16 +1,15 @@
 package projet;
 
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 
 import javafx.stage.Stage;
 import javafx.stage.Window;
-import java.awt.image.BufferedImage;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.scene.image.ImageView;
-import javafx.embed.swing.SwingFXUtils;
+import javafx.scene.image.PixelWriter;
 
 
 
@@ -19,8 +18,8 @@ import javafx.embed.swing.SwingFXUtils;
  * <br>It contains all the different pages and multiple function of the GUI
  */
 public class Graphic_Interface extends Application {
-    private int WIDTH = 1200;
-    private int HEIGHT = 800;
+    private int WIDTH = 1150;
+    private int HEIGHT = 539;
     public Stage primaryStage;
 
 
@@ -35,6 +34,10 @@ public class Graphic_Interface extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         window = (Window) primaryStage;
+        BorderPane root = new BorderPane();
+        Scene first = new Scene(root);
+        primaryStage.setScene(first);
+
 
     
         primaryStage.setMinHeight(100);
@@ -45,32 +48,26 @@ public class Graphic_Interface extends Application {
 
 
         
-        var img=new BufferedImage(800, 500, BufferedImage.TYPE_INT_RGB);
-        for (int i = 0; i<800;i++){
-            for(int y = 0; y<500;y++){
-                int r = ((y*355)/500); int g = ((i*355/800)); int b = 208;
-                int col = (r << 16) | (g << 8) | b;
-                img.setRGB(i,y,col);
-            }
-        }
 
-        WritableImage image = SwingFXUtils.toFXImage(img, null);
+        WritableImage image = new WritableImage(800,500);
         ImageView imageView = new ImageView();
         imageView.setImage(image);
 
 
 
-        BorderPane root = new BorderPane();
         root.setLeft(imageView);
+        
+        PixelWriter write = image.getPixelWriter();
 
-        Menu menu = new Menu();
+        Control control = new Control(write);
+        Menu menu = new Menu(root);
 
         root.setRight(menu);
 
-        Scene first = new Scene(root);
 
-        primaryStage.setScene(first);
         primaryStage.show();
+
+       
 
     }
 }
