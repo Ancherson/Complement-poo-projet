@@ -3,6 +3,7 @@ public class Complexe{
     private double re;
     private double im;
 
+    /*Small Class that allow us to use real complex number with usfull methods as multiply and abs*/
     public Complexe (double re, double im){
         this.re = re;
         this.im = im;

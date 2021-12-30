@@ -1,10 +1,18 @@
 package projet;
 
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.lang.Thread.State;
 
+import javax.imageio.ImageIO;
+
+import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
@@ -13,6 +21,13 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+
+
+
+/*The VBox that will contains all the buttons and the textfield to change the parameter and edit the image
+It also contains the method to launch the actualization threads
+*/
 
 public class Menu extends VBox{
     private double padding = 0.005;
@@ -22,7 +37,11 @@ public class Menu extends VBox{
     private TextField client_im = new TextField("0.156");
     private TextField iterations = new TextField("500");
     private TextField radius = new TextField("2");
+    private CheckBox Julia_set = new CheckBox("Julia set");
+
     private BorderPane pane;
+    private WritableImage image = new WritableImage(800,500);
+
     public Menu(BorderPane pane){
         this.pane =pane;
         HBox calc_parameters = new HBox();
@@ -36,6 +55,15 @@ public class Menu extends VBox{
 
 
         HBox client_label = new HBox();
+        Label ite_rad = new Label("number of iterations              the radius     ");
+
+        Label cont = new Label("---- Controls ----");
+        Label cont2 = new Label("------------------");
+        cont.setFont(new Font(20));
+        cont2.setFont(new Font(20));
+
+        Julia_set.setSelected(true);
+
 
         Label client_complexe_label = new Label("Enter the real part and the imaginary part");
 
@@ -61,10 +89,27 @@ public class Menu extends VBox{
 
         Button reset = new Button("reset");
 
+        Button save = new Button("save");
+        HBox command = new HBox(b,save);
+        command.setAlignment(Pos.CENTER);
+        TextField name = new TextField("Image_name");
 
-        //this.getChildren().add(a);
-        this.getChildren().add(b);
-        this.getChildren().addAll(calc_parameters,client_complexe,client_label,zoom,deplacements,reset);
+        this.getChildren().addAll(ite_rad,calc_parameters,cont,zoom,deplacements,cont2,reset,name,command,Julia_set,client_label,client_complexe);
+        this.setSpacing(10);
+
+        Julia_set.setOnAction(event -> {
+            if(!Julia_set.isSelected()){
+                this.getChildren().remove(client_label);
+                this.getChildren().remove(client_complexe);
+            }else{
+                this.getChildren().add(client_label);
+                this.getChildren().add(client_complexe);
+            }
+        });
+
+        save.setOnAction(event -> {
+            this.save(name.getText());
+        });
 
         reset.setOnAction(event -> {
             padding = 0.005;
@@ -103,20 +148,31 @@ public class Menu extends VBox{
             Launch_calc();
         });
     }
-
+/*Function to save the image */
+    private void save(String name){
+        File file = new File("../"+name+".png");
+        BufferedImage bImage = SwingFXUtils.fromFXImage(this.image, null);
+        try {
+          ImageIO.write(bImage, "png", file);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+    }
+/*Function to start Thread that will calculate the new image */
     private void Launch_calc(){
-        WritableImage image = new WritableImage(800,500);
+        this.image = new WritableImage(800,500);
         PixelWriter write = image.getPixelWriter();
         Control c1 = new Control(write);
 
         Complexe com = new Complexe(Double.parseDouble(client_re.getText()),Double.parseDouble(client_im.getText()));
-        Calcul calc1 = new Calcul(0, 800, 500, padding,Yoffset,Xoffset, Integer.parseInt(iterations.getText()), Integer.parseInt(radius.getText()), com, c1);
+        Boolean b = Julia_set.isSelected();
+        Calcul calc1 = new Calcul(0, 800, 500, padding,Yoffset,Xoffset, Integer.parseInt(iterations.getText()), Integer.parseInt(radius.getText()), com, c1,b);
         Thread t1 = new Thread(calc1);
-        Calcul calc2 = new Calcul( 1, 800, 500,padding,Yoffset,Xoffset,  Integer.parseInt(iterations.getText()), Integer.parseInt(radius.getText()), com, c1);
+        Calcul calc2 = new Calcul( 1, 800, 500,padding,Yoffset,Xoffset,  Integer.parseInt(iterations.getText()), Integer.parseInt(radius.getText()), com, c1,b);
         Thread t2 = new Thread(calc2);
-        Calcul calc3 = new Calcul(2, 800, 500,padding,Yoffset,Xoffset,  Integer.parseInt(iterations.getText()), Integer.parseInt(radius.getText()), com, c1);
+        Calcul calc3 = new Calcul(2, 800, 500,padding,Yoffset,Xoffset,  Integer.parseInt(iterations.getText()), Integer.parseInt(radius.getText()), com, c1,b);
         Thread t3 = new Thread(calc3);
-        Calcul calc4 = new Calcul(3, 800, 500,padding,Yoffset,Xoffset,  Integer.parseInt(iterations.getText()), Integer.parseInt(radius.getText()), com, c1);
+        Calcul calc4 = new Calcul(3, 800, 500,padding,Yoffset,Xoffset,  Integer.parseInt(iterations.getText()), Integer.parseInt(radius.getText()), com, c1,b);
         Thread t4 = new Thread(calc4);
         t1.start();
         t2.start();            

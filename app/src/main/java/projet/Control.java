@@ -4,7 +4,10 @@ import javafx.scene.Scene;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.paint.Color;
 
+/*A control class that have the ability to update the image using it's pixelwriter
+This class was created to separate the view and the model*/
 public class Control {
+
     private PixelWriter writer;
 
     public Control(PixelWriter w){
